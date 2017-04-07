@@ -75,3 +75,14 @@ def simulate(height, width):
 
         yield TICK
 
+
+def live_a_generation(grid,sim):
+    progeny = GridMain(grid.height,grid.width)
+    item = next(sim)
+    while item is not TICK:
+        if isinstance(item, Query):
+            state = grid.query(item.y,item.x)
+            item = sim.send(state)
+        else:
+            progeny.assign(item.y,item.x,item.state)
+            item
