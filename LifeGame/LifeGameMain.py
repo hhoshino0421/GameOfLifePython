@@ -1,5 +1,6 @@
 from collections import namedtuple
-import GridMain
+from GridMain import Grid
+from GridMain import ColumnPrinter
 
 '''
 状態定数定義
@@ -76,13 +77,30 @@ def simulate(height, width):
         yield TICK
 
 
-def live_a_generation(grid,sim):
-    progeny = GridMain(grid.height,grid.width)
+def live_a_generation(grid, sim):
+    progeny = Grid(grid.height, grid.width)
     item = next(sim)
     while item is not TICK:
         if isinstance(item, Query):
-            state = grid.query(item.y,item.x)
+            state = grid.query(item.y, item.x)
             item = sim.send(state)
         else:
-            progeny.assign(item.y,item.x,item.state)
-            item
+            progeny.assign(item.y, item.x, item.state)
+            item = next(sim)
+    return progeny
+
+
+# テスト用ロジック
+grid = Grid(5, 5)
+grid.assign(1, 1, ALIVE)
+grid.assign(2, 2, ALIVE)
+grid.assign(2, 3, ALIVE)
+grid.assign(3, 3, ALIVE)
+columns = ColumnPrinter()
+sim = simulate(grid.height, grid.width)
+
+for i in range(100):
+    columns.append(str(grid))
+    grid = live_a_generation(grid, sim)
+
+print(columns)
